@@ -1,0 +1,24 @@
+stages:
+  prepare:
+    cmd: python src/data/load_data.py
+    deps:
+      - src/data/load_data.py
+    outs:
+      - data/raw
+
+  features:
+    cmd: python src/features/make_features.py
+    deps:
+      - data/raw
+      - src/features/make_features.py
+    outs:
+      - data/processed
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - data/processed
+      - src/train.py
+      - src/models/train_xgboost.py
+    outs:
+      - models/

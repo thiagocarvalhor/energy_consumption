@@ -1,0 +1,27 @@
+data:
+  data:
+    source: kaggle
+    path: data/raw/kaggle_energy.csv
+    datetime_column: timestamp
+    target_column: consumption
+    freq: 1h
+model:
+  model:
+    name: xgboost_regressor
+    params:
+      n_estimators: 500
+      max_depth: 6
+      learning_rate: 0.05
+      subsample: 0.8
+      colsample_bytree: 0.8
+      objective: reg:squarederror
+training:
+  training:
+    test_size: 0.2
+    random_state: 42
+    log_to_mlflow: true
+logging:
+  mlflow:
+    tracking_uri: https://dagshub.com/thiagocarvalhor/energy_consumption.mlflow
+    experiment_name: energy_forecast
+experiment_name: energy_forecasting_experiment

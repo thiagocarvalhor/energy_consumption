@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtualenvs
+.env/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/raw/*
+data/processed/*
+data/external/*
+
+# MLflow
+mlruns/
+
+# DVC
+.dvc/cache/
+.dvc/tmp/
+!.dvc/
+
+# VSCode
+.vscode/
+
+# System
+.DS_Store
+Thumbs.db

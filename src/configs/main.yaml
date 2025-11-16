@@ -1,0 +1,7 @@
+defaults:
+  - data: kaggle
+  - model: xgboost
+  - training: default
+  - logging: mlflow
+
+experiment_name: "energy_forecasting_experiment"

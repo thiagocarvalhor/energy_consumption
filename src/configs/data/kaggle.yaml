@@ -1,0 +1,6 @@
+data:
+  source: "kaggle"
+  path: "data/raw/kaggle_energy.csv"
+  datetime_column: "timestamp"
+  target_column: "consumption"
+  freq: "1h"
