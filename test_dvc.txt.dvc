@@ -1,0 +1,5 @@
+outs:
+- md5: 0b331b8ca02418d44fceaffe523d9155
+  size: 10
+  hash: md5
+  path: test_dvc.txt
