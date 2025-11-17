@@ -2,8 +2,6 @@
 
 Time Series Forecasting with XGBoost, Hydra, DVC and MLflow
 
-Teste de sincronização GitHub → DagsHub (commit automático)
-
 ## Project Structure
 
 This project follows a modular and extensible MLOps architecture:
