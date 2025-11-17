@@ -3,7 +3,7 @@ name = "energy_consumption"
 version = "0.1.0"
 description = "Time Series Forecasting with XGBoost, Hydra, DVC and MLflow"
 authors = [
-    {name = "Thiago Ribeiro", email = "152446274+thiagocarvalhor@users.noreply.github.com"}
+    { name = "Thiago Ribeiro", email = "152446274+thiagocarvalhor@users.noreply.github.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -20,14 +20,12 @@ dependencies = [
     "rich",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest",
-    "pre-commit",
-    "black",
-    "isort",
-    "flake8",
-]
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pre-commit = "^3.0"
+black = "^24.0"
+isort = "^5.13"
+flake8 = "^7.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
