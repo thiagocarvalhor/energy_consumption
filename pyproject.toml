@@ -26,6 +26,7 @@ pre-commit = "^3.0"
 black = "^24.0"
 isort = "^5.13"
 flake8 = "^7.0"
+ipykernel = "^7.1.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

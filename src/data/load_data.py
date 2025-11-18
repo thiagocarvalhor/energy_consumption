@@ -6,7 +6,7 @@ import pandas as pd
 
 def load_raw_energy_data(raw_path: str) -> pd.DataFrame:
     """
-    Load the raw energy dataset stored locally.
+    Load the PJME_hourly.csv dataset and prepare the datetime index.
 
     Parameters
     ----------
@@ -16,48 +16,39 @@ def load_raw_energy_data(raw_path: str) -> pd.DataFrame:
     Returns
     -------
     pd.DataFrame
-        DataFrame with datetime column parsed and sorted.
+        DataFrame indexed by Datetime (parsed as datetime64).
     """
     if not os.path.exists(raw_path):
         raise FileNotFoundError(f"Raw dataset not found at: {raw_path}")
 
+    # Load CSV exactly like Kaggle
     df = pd.read_csv(raw_path)
 
-    # Standard Kaggle notebook step:
-    # Parse timestamp column and sort
-    datetime_col = "timestamp"
+    datetime_col = "Datetime"
     if datetime_col not in df.columns:
         raise ValueError(f"Column '{datetime_col}' not found in dataset.")
 
+    # Set Datetime as index
     df[datetime_col] = pd.to_datetime(df[datetime_col])
-    df = df.sort_values(datetime_col).reset_index(drop=True)
+    df = df.set_index(datetime_col)
+
+    # Sort index (always safe for time series)
+    df = df.sort_index()
 
     return df
 
 
 def save_interim(df: pd.DataFrame, output_path: str) -> None:
     """
-    Save cleaned raw dataset into interim directory.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        DataFrame to save.
-    output_path : str
-        Path to save the interim CSV.
+    Save cleaned dataset to interim directory.
     """
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    df.to_csv(output_path, index=False)
+    df.to_csv(output_path)
 
 
-def main():
-    """
-    Executes the raw → interim data transformation.
+def main( raw_path = "data/raw/PJME_hourly.csv",
+    interim_path = "data/interim/energy_interim.csv"):
 
-    Adjust paths below according to your cookiecutter structure.
-    """
-    raw_path = "data/raw/kaggle_energy.csv"
-    interim_path = "data/interim/energy_interim.csv"
 
     print(f"Loading raw dataset from: {raw_path}")
     df = load_raw_energy_data(raw_path)
