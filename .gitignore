@@ -28,3 +28,4 @@ mlruns/
 # System
 .DS_Store
 Thumbs.db
+/test_dvc.txt
