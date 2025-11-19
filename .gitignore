@@ -19,7 +19,10 @@ data/interim/*
 mlruns/
 
 # Models
+# Ignore model artifacts (root-level)
 models/*
+!models/.gitkeep
+
 
 # DVC
 .dvc/cache/
