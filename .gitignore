@@ -19,7 +19,7 @@ data/interim/*
 mlruns/
 
 # Models
-models/
+models/*
 
 # DVC
 .dvc/cache/
