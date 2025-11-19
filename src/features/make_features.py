@@ -1,3 +1,5 @@
+import pandas as pd
+
 def preprocess(df):
     """
     Remove outliers and perform basic cleaning.
