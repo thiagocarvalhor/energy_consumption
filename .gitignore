@@ -18,6 +18,9 @@ data/interim/*
 # MLflow
 mlruns/
 
+# Models
+models/
+
 # DVC
 .dvc/cache/
 .dvc/tmp/
