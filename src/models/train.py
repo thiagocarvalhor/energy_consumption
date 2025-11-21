@@ -7,17 +7,20 @@ from sklearn.metrics import mean_squared_error
 
 def train_model(
     processed_path="data/processed/energy_features.csv",
-    model_output_path="models/xgb_model.pkl",
+    model_output_path="models/xgb_model_2014.pkl",
+    train_end="2014-01-01"
 ):
     """
     Train an XGBoost model using time-series cross-validation (TimeSeriesSplit)
     """
 
-    # Load processed data
+    print("\n Loading processed dataset...")
     df = pd.read_csv(processed_path, parse_dates=["Datetime"], index_col="Datetime")
     df = df.sort_index()
 
-    # Features used in Kaggle
+    # ──────────────────────────────────────────────
+    # Define features
+    # ──────────────────────────────────────────────
     FEATURES = [
         "dayofyear",
         "hour",
@@ -31,25 +34,35 @@ def train_model(
     ]
     TARGET = "PJME_MW"
 
-    # Drop rows with NaN caused by lag creation
-    df = df.dropna(subset=FEATURES + [TARGET])
+    # ──────────────────────────────────────────────
+    # CUT TRAINING WINDOW (important)
+    # ──────────────────────────────────────────────
+    df_train = df[df.index < train_end].copy()
+    print(f"📌 Training window end: {train_end}")
+    print(f"📌 Training samples: {len(df_train):,}")
 
-    # TimeSeriesSplit config (same as Kaggle)
+    # Remove NaNs created by lag features
+    df_train = df_train.dropna(subset=FEATURES + [TARGET])
+
+    # ──────────────────────────────────────────────
+    # TimeSeriesSplit — only inside the training period
+    # ──────────────────────────────────────────────
     tss = TimeSeriesSplit(
         n_splits=5,
-        test_size=24 * 365 * 1,  # 1 year test window per fold
-        gap=24,                  # 24h gap
+        test_size=24 * 365,  # 1 year
+        gap=24               # 24-hour gap
     )
 
     scores = []
     fold = 0
+    model = None  # will store last trained model
 
-    for train_idx, val_idx in tss.split(df):
+    for train_idx, val_idx in tss.split(df_train):
         fold += 1
         print(f"\n===== FOLD {fold} =====")
 
-        train = df.iloc[train_idx]
-        val = df.iloc[val_idx]
+        train = df_train.iloc[train_idx]
+        val = df_train.iloc[val_idx]
 
         X_train = train[FEATURES]
         y_train = train[TARGET]
@@ -57,7 +70,7 @@ def train_model(
         X_val = val[FEATURES]
         y_val = val[TARGET]
 
-        # XGBoost model parameters from Kaggle
+        # Kaggle-like XGBoost model
         model = xgb.XGBRegressor(
             base_score=0.5,
             booster="gbtree",
@@ -75,20 +88,27 @@ def train_model(
             verbose=100,
         )
 
-        # Validation predictions
         y_pred = model.predict(X_val)
         rmse = np.sqrt(mean_squared_error(y_val, y_pred))
         scores.append(rmse)
 
         print(f"Fold {fold} RMSE: {rmse:.4f}")
 
+    # ──────────────────────────────────────────────
+    # FINAL RESULTS
+    # ──────────────────────────────────────────────
     print("\n===== RESULTS =====")
     print(f"RMSE per fold: {scores}")
     print(f"Mean RMSE: {np.mean(scores):.4f}")
 
-    # Save final model (the last trained one)
+    # ──────────────────────────────────────────────
+    # Save final model (from last fold)
+    # ──────────────────────────────────────────────
+    print(f"\n Saving model to: {model_output_path}")
     model.save_model(model_output_path)
-    print(f"\nModel saved to {model_output_path}")
+    print("✅ Model saved successfully!")
+
+    return model
 
 
 def main():
