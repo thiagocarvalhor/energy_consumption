@@ -145,7 +145,9 @@ def predict_future(
     df_future["prediction"] = model.predict(df_future[FEATURES])
 
     print(f" Saving predictions to {output_path}")
-    df_future[["prediction"]].to_csv(output_path)
+    df_future.index.name = "Datetime"
+    df_future[["prediction"]].to_csv(output_path, index=True)
+
 
     print("\n Prediction completed!")
     return df_future
