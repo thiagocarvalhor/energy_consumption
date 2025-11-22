@@ -1,0 +1,14 @@
+predict:
+  model_path: "outputs/xgboost.json"
+
+  features_path: "data/processed/energy_features.csv"
+
+  # Onde salvar previsões
+  test_output_path: "data/processed/test_predictions.csv"
+  future_output_path: "data/processed/future_predictions.csv"
+
+  datetime_column: "Datetime"
+  target_column: "PJME_MW"
+
+  # Horizonte do forecast futuro
+  forecast_horizon: 365 * 24      # 1 ano

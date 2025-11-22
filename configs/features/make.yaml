@@ -1,0 +1,9 @@
+features:
+  input_path: "data/interim/energy_raw.csv"
+  output_path: "data/processed/energy_features.csv"
+
+  datetime_column: "Datetime"
+  target_column: "PJME_MW"
+
+  # Lags equivalentes a 1, 2 e 3 anos
+  lags: [364, 728, 1092]

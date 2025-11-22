@@ -1,0 +1,31 @@
+train:
+  features:
+    # A ordem aqui deve bater com seu train.py
+    columns:
+      - dayofyear
+      - hour
+      - dayofweek
+      - quarter
+      - month
+      - year
+      - lag_364d
+      - lag_728d
+      - lag_1092d
+
+  target: "PJME_MW"
+
+  # Parâmetros do modelo XGBoost
+  model:
+    name: "xgboost"
+    n_estimators: 1000
+    max_depth: 3
+    learning_rate: 0.01
+    booster: "gbtree"
+    base_score: 0.5
+    objective: "reg:squarederror"
+
+  # Time-series cross-validation
+  cv:
+    n_splits: 5
+    test_size: 8760      # 365 dias * 24h
+    gap: 24              # 24h gap

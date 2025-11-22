@@ -1,6 +1,5 @@
-data:
-  path: "data/raw/pjme_hourly.csv"
-  datetime_column: "Datetime"
-  target_column: "PJME_MW"
-  freq: "1H"
-  train_end: "2014-01-01"
+path: "data/processed/energy_features.csv"
+datetime_column: "Datetime"
+target_column: "PJME_MW"
+freq: "1H"
+train_end: "2014-01-01"

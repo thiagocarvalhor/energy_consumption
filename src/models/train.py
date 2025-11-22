@@ -6,10 +6,14 @@ import numpy as np
 import xgboost as xgb
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
+from pathlib import Path
+
+CONFIG_DIR = str(Path(__file__).resolve().parents[2] / "configs")
 
 
-@hydra.main(config_path="configs", config_name="config", version_base=None)
-def main(cfg: DictConfig):
+
+@hydra.main(config_path=CONFIG_DIR, config_name="config", version_base=None)
+def main(cfg):
 
     # ────────────────────────────────────────────────
     # 1. LOAD DATA
@@ -50,7 +54,7 @@ def main(cfg: DictConfig):
     # ────────────────────────────────────────────────
     # 3. TIME SERIES SPLIT
     # ────────────────────────────────────────────────
-    print("\n⏳ Running TimeSeriesSplit CV...")
+    print("\n Running TimeSeriesSplit CV...")
 
     tss = TimeSeriesSplit(
         n_splits=5,
@@ -91,7 +95,6 @@ def main(cfg: DictConfig):
             X_train,
             y_train,
             eval_set=[(X_train, y_train), (X_val, y_val)],
-            early_stopping_rounds=cfg.model.early_stopping_rounds,
             verbose=100,
         )
 

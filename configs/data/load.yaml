@@ -1,0 +1,8 @@
+data_load:
+  raw_path: "data/raw/pjme_hourly.csv"
+  output_path: "data/interim/energy_raw.csv"
+
+  datetime_column: "Datetime"
+  target_column: "PJME_MW"
+
+  freq: "1H"

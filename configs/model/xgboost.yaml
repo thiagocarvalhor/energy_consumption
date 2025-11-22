@@ -1,9 +1,8 @@
-model:
-  name: "xgboost"
-  n_estimators: 1000
-  max_depth: 3
-  learning_rate: 0.01
-  booster: "gbtree"
-  base_score: 0.5
-  objective: "reg:squarederror"
-  early_stopping_rounds: 50
+name: "xgboost"
+n_estimators: 1000
+max_depth: 3
+learning_rate: 0.01
+booster: "gbtree"
+base_score: 0.5
+objective: "reg:squarederror"
+early_stopping_rounds: 50

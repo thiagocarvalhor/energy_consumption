@@ -1,7 +1,8 @@
 defaults:
-  - data: kaggle
-  - model: xgboost
-  - forecast: base
+  - data_load: load
+  - features: make
+  - train: train
+  - predict: default
   - eval: default
   - mlflow: dagshub
   - _self_
