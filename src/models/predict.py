@@ -4,24 +4,26 @@ import pandas as pd
 import numpy as np
 import xgboost as xgb
 from sklearn.metrics import mean_squared_error
+from datetime import timedelta
+
+# Importa funções de features
+from src.features.make_features import (
+    preprocess,
+    create_time_features,
+    create_lag_features,
+)
+
+# Importa função de carregar modelo
+from src.utils.models import load_model
+
 
 # ──────────────────────────────────────────────
-# 1. LOAD MODEL
-# ──────────────────────────────────────────────
-
-def load_model(model_path="models/xgb_model.pkl"):
-    model = xgb.XGBRegressor()
-    model.load_model(model_path)
-    return model
-
-
-# ──────────────────────────────────────────────
-# 2. PREDICT TEST (com y verdadeiro)
+# 2. PREDICT TEST
 # ──────────────────────────────────────────────
 
 def predict_test(
     processed_path="data/processed/energy_features.csv",
-    model_path="models/xgb_model.pkl",
+    model_path="models/xgb_model_2014.pkl",
     output_path="data/processed/test_predictions.csv",
     split_date="2014-01-01"
 ):
@@ -64,7 +66,7 @@ def predict_test(
     y_pred = model.predict(X_test)
 
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    print(f"\n✅ Test RMSE: {rmse:,.2f}")
+    print(f"\n Test RMSE: {rmse:,.2f}")
 
     print(f" Saving predictions to {output_path}")
 
@@ -76,27 +78,17 @@ def predict_test(
 
 
 # ──────────────────────────────────────────────
-# 3. PREDICT FUTURE (sem y verdadeiro)
+# 3. PREDICT FUTURE
 # ──────────────────────────────────────────────
 
 def build_full_feature_set(df):
-    """
-    Apply preprocessing, time-based features and lag features
-    to historical data.
-    """
     df = preprocess(df)
     df = create_time_features(df)
-
-    lags = [364, 728, 1092]
-    df = create_lag_features(df, target_col="PJME_MW", lags=lags)
-
+    df = create_lag_features(df, target_col="PJME_MW", lags=[364, 728, 1092])
     return df
 
 
 def create_future_dataframe(last_date, periods=24 * 365):
-    """
-    Create future hourly timestamps for prediction.
-    """
 
     future_index = pd.date_range(
         start=last_date + timedelta(hours=1),
@@ -110,16 +102,8 @@ def create_future_dataframe(last_date, periods=24 * 365):
 
 
 def build_features_for_future(df_full):
-    """
-    After concatenating historical + future,
-    apply the SAME feature functions to the future data.
-    """
-
     df_full = create_time_features(df_full)
-
-    lags = [364, 728, 1092]
-    df_full = create_lag_features(df_full, target_col="PJME_MW", lags=lags)
-
+    df_full = create_lag_features(df_full, target_col="PJME_MW", lags=[364, 728, 1092])
     return df_full
 
 
@@ -127,12 +111,8 @@ def predict_future(
     processed_path="data/processed/energy_features.csv",
     model_path="models/xgb_model.pkl",
     output_path="data/processed/future_predictions.csv",
-    future_hours=24 * 365,  # 1 ano
+    future_hours=24 * 365,
 ):
-    """
-    Generate future predictions using the trained XGBoost model.
-    """
-
     print("\n Loading historical processed data...")
     df = pd.read_csv(processed_path, parse_dates=["Datetime"], index_col="Datetime")
     df = df.sort_index()
@@ -154,7 +134,6 @@ def predict_future(
     print(" Applying feature engineering to future data...")
     df_future_all = build_features_for_future(df_future_all)
 
-    # Select only future rows
     df_future = df_future_all[df_future_all["isFuture"] == True].copy()
 
     FEATURES = [
@@ -173,13 +152,12 @@ def predict_future(
 
 
 # ──────────────────────────────────────────────
-# 4. MAIN 
+# 4. MAIN
 # ──────────────────────────────────────────────
 
 def main():
-    # Você escolhe o que rodar
-    predict_test()
-    # predict_future()
+    # predict_test()
+    predict_future()
 
 
 if __name__ == "__main__":
