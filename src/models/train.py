@@ -106,7 +106,7 @@ def train_model(
     # ──────────────────────────────────────────────
     print(f"\n Saving model to: {model_output_path}")
     model.save_model(model_output_path)
-    print("✅ Model saved successfully!")
+    print(" Model saved successfully!")
 
     return model
 

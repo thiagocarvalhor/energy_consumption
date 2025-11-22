@@ -1,3 +1,0 @@
-mlflow:
-  tracking_uri: "https://dagshub.com/thiagocarvalhor/energy_consumption.mlflow"
-  experiment_name: "energy_forecast"

@@ -1,7 +1,9 @@
 defaults:
   - data: kaggle
   - model: xgboost
-  - training: default
-  - logging: mlflow
+  - forecast: base
+  - eval: default
+  - mlflow: dagshub
 
-experiment_name: "energy_forecasting_experiment"
+seed: 42
+output_dir: "outputs"

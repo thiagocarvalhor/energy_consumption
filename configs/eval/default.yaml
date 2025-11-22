@@ -1,0 +1,8 @@
+eval:
+  actual_path: "data/processed/energy_features.csv"
+  test_pred_path: "data/processed/test_predictions.csv"
+  future_pred_path: "data/processed/future_predictions.csv"
+  output_dir: "data/evaluation"
+  target_col: "PJME_MW"
+  pred_col: "prediction"
+  datetime_col: "Datetime"
