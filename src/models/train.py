@@ -1,3 +1,6 @@
+import os
+import hydra
+from omegaconf import DictConfig
 import pandas as pd
 import numpy as np
 import xgboost as xgb
@@ -5,22 +8,21 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
 
 
-def train_model(
-    processed_path="data/processed/energy_features.csv",
-    model_output_path="models/xgb_model_2014.pkl",
-    train_end="2014-01-01"
-):
-    """
-    Train an XGBoost model using time-series cross-validation (TimeSeriesSplit)
-    """
+@hydra.main(config_path="configs", config_name="config", version_base=None)
+def main(cfg: DictConfig):
 
+    # ────────────────────────────────────────────────
+    # 1. LOAD DATA
+    # ────────────────────────────────────────────────
     print("\n Loading processed dataset...")
-    df = pd.read_csv(processed_path, parse_dates=["Datetime"], index_col="Datetime")
+    df = pd.read_csv(
+        cfg.data.path,
+        parse_dates=[cfg.data.datetime_column],
+        index_col=cfg.data.datetime_column
+    )
     df = df.sort_index()
 
-    # ──────────────────────────────────────────────
-    # Define features
-    # ──────────────────────────────────────────────
+    TARGET = cfg.data.target_column
     FEATURES = [
         "dayofyear",
         "hour",
@@ -32,33 +34,34 @@ def train_model(
         "lag_728d",
         "lag_1092d",
     ]
-    TARGET = "PJME_MW"
 
-    # ──────────────────────────────────────────────
-    # CUT TRAINING WINDOW (important)
-    # ──────────────────────────────────────────────
+    # ────────────────────────────────────────────────
+    # 2. FILTER TRAIN WINDOW
+    # ────────────────────────────────────────────────
+    train_end = cfg.data.train_end
     df_train = df[df.index < train_end].copy()
-    print(f"📌 Training window end: {train_end}")
-    print(f"📌 Training samples: {len(df_train):,}")
 
-    # Remove NaNs created by lag features
+    print(f"\n Training end date: {train_end}")
+    print(f" Training samples: {len(df_train):,}")
+
+    # Drop NaN (caused by lag features)
     df_train = df_train.dropna(subset=FEATURES + [TARGET])
 
-    # ──────────────────────────────────────────────
-    # TimeSeriesSplit — only inside the training period
-    # ──────────────────────────────────────────────
+    # ────────────────────────────────────────────────
+    # 3. TIME SERIES SPLIT
+    # ────────────────────────────────────────────────
+    print("\n⏳ Running TimeSeriesSplit CV...")
+
     tss = TimeSeriesSplit(
         n_splits=5,
-        test_size=24 * 365,  # 1 year
+        test_size=24 * 365,  # 1 year in hours
         gap=24               # 24-hour gap
     )
 
     scores = []
-    fold = 0
-    model = None  # will store last trained model
+    model = None
 
-    for train_idx, val_idx in tss.split(df_train):
-        fold += 1
+    for fold, (train_idx, val_idx) in enumerate(tss.split(df_train), start=1):
         print(f"\n===== FOLD {fold} =====")
 
         train = df_train.iloc[train_idx]
@@ -70,21 +73,25 @@ def train_model(
         X_val = val[FEATURES]
         y_val = val[TARGET]
 
-        # Kaggle-like XGBoost model
+        # ────────────────────────────────────────────────
+        # 4. MODEL FROM HYDRA CONFIG
+        # ────────────────────────────────────────────────
         model = xgb.XGBRegressor(
-            base_score=0.5,
-            booster="gbtree",
-            n_estimators=1000,
-            early_stopping_rounds=50,
-            objective="reg:linear",
-            max_depth=3,
-            learning_rate=0.01,
+            booster=cfg.model.booster,
+            n_estimators=cfg.model.n_estimators,
+            max_depth=cfg.model.max_depth,
+            learning_rate=cfg.model.learning_rate,
+            base_score=cfg.model.base_score,
+            objective=cfg.model.objective,
+            random_state=cfg.seed,
         )
 
+        # Train with early stopping
         model.fit(
             X_train,
             y_train,
             eval_set=[(X_train, y_train), (X_val, y_val)],
+            early_stopping_rounds=cfg.model.early_stopping_rounds,
             verbose=100,
         )
 
@@ -94,25 +101,24 @@ def train_model(
 
         print(f"Fold {fold} RMSE: {rmse:.4f}")
 
-    # ──────────────────────────────────────────────
-    # FINAL RESULTS
-    # ──────────────────────────────────────────────
-    print("\n===== RESULTS =====")
+    # ────────────────────────────────────────────────
+    # 5. FINAL RESULTS
+    # ────────────────────────────────────────────────
+    print("\n===== FINAL CV RESULTS =====")
     print(f"RMSE per fold: {scores}")
     print(f"Mean RMSE: {np.mean(scores):.4f}")
 
-    # ──────────────────────────────────────────────
-    # Save final model (from last fold)
-    # ──────────────────────────────────────────────
-    print(f"\n Saving model to: {model_output_path}")
-    model.save_model(model_output_path)
+    # ────────────────────────────────────────────────
+    # 6. SAVE MODEL IN HYDRA OUTPUT DIR
+    # ────────────────────────────────────────────────
+    output_dir = os.getcwd()
+    model_path = os.path.join(output_dir, f"{cfg.model.name}.json")
+
+    print(f"\n Saving model to: {model_path}")
+    model.save_model(model_path)
     print(" Model saved successfully!")
 
     return model
-
-
-def main():
-    train_model()
 
 
 if __name__ == "__main__":
