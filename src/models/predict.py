@@ -1,165 +1,148 @@
 # src/models/predict.py
 
+import os
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from sklearn.metrics import mean_squared_error
+from pathlib import Path
+from omegaconf import DictConfig
+from hydra.utils import get_original_cwd
+import hydra
 from datetime import timedelta
 
-# Importa funções de features
-from src.features.make_features import (
+# Import feature builders
+from src.data.make_features import (
     preprocess,
     create_time_features,
     create_lag_features,
 )
 
-# Importa função de carregar modelo
-from src.utils.models import load_model
+
+# =====================================================
+# FUNÇÕES DE APOIO
+# =====================================================
+
+def load_xgb_model(path):
+    model = xgb.XGBRegressor()
+    model.load_model(path)
+    return model
 
 
-# ──────────────────────────────────────────────
-# 2. PREDICT TEST
-# ──────────────────────────────────────────────
-
-def predict_test(
-    processed_path="data/processed/energy_features.csv",
-    model_path="models/xgb_model_2014.pkl",
-    output_path="data/processed/test_predictions.csv",
-    split_date="2014-01-01"
-):
-    """
-    Run prediction on historical test data (real known data).
-    Train until split_date, predict after split_date.
-    """
-
-    print("\n Loading processed dataset...")
-    df = pd.read_csv(processed_path, parse_dates=["Datetime"], index_col="Datetime")
-    df = df.sort_index()
-
-    FEATURES = [
-        "dayofyear", "hour", "dayofweek", "quarter", "month", "year",
-        "lag_364d", "lag_728d", "lag_1092d"
-    ]
-    TARGET = "PJME_MW"
-
-    print(" Splitting train/test based on date...")
-
-    train = df[df.index < split_date].copy()
-    test = df[df.index >= split_date].copy()
-
-    print(f"Train size: {len(train)}, Test size: {len(test)}")
-
-    print(" Dropping NaN rows caused by lags...")
-    train = train.dropna(subset=FEATURES + [TARGET])
-    test = test.dropna(subset=FEATURES + [TARGET])
-
-    X_train = train[FEATURES]
-    y_train = train[TARGET]
-
-    X_test = test[FEATURES]
-    y_test = test[TARGET]
-
-    print(" Loading model...")
-    model = load_model(model_path)
-
-    print(" Predicting on test set...")
-    y_pred = model.predict(X_test)
-
-    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    print(f"\n Test RMSE: {rmse:,.2f}")
-
-    print(f" Saving predictions to {output_path}")
-
-    out_df = test.copy()
-    out_df["prediction"] = y_pred
-    out_df[["PJME_MW", "prediction"]].to_csv(output_path)
-
-    return out_df, rmse
-
-
-# ──────────────────────────────────────────────
-# 3. PREDICT FUTURE
-# ──────────────────────────────────────────────
-
-def build_full_feature_set(df):
+def build_features(df):
     df = preprocess(df)
     df = create_time_features(df)
     df = create_lag_features(df, target_col="PJME_MW", lags=[364, 728, 1092])
     return df
 
 
-def create_future_dataframe(last_date, periods=24 * 365):
+# =====================================================
+# 1. PREDICT TEST
+# =====================================================
+
+def predict_test(df, model, split_date, features, target, output_path):
+    df_train = df[df.index < split_date].copy()
+    df_test = df[df.index >= split_date].copy()
+
+    df_train = df_train.dropna(subset=features + [target])
+    df_test = df_test.dropna(subset=features + [target])
+
+    X_test = df_test[features]
+    y_test = df_test[target]
+
+    print("\n Running TEST prediction...")
+    pred = model.predict(X_test)
+
+    df_test["prediction"] = pred
+    rmse = np.sqrt(np.mean((y_test - pred) ** 2))
+
+    print(f" Test RMSE: {rmse:,.4f}")
+
+    os.makedirs(output_path.parent, exist_ok=True)
+    df_test[[target, "prediction"]].to_csv(output_path)
+
+    print(f" Test predictions saved to: {output_path}")
+
+    return df_test, rmse
+
+
+# =====================================================
+# 2. PREDICT FUTURE
+# =====================================================
+
+def predict_future(df, model, horizon_hours, features, output_path):
+    last_date = df.index.max()
 
     future_index = pd.date_range(
         start=last_date + timedelta(hours=1),
-        periods=periods,
+        periods=horizon_hours,
         freq="1H"
     )
 
     future_df = pd.DataFrame(index=future_index)
-    future_df["isFuture"] = True
-    return future_df
+    df_all = pd.concat([df, future_df])
+
+    df_all = create_time_features(df_all)
+    df_all = create_lag_features(df_all, target_col="PJME_MW", lags=[364, 728, 1092])
+
+    df_future = df_all.loc[future_index].copy()
+    df_future["prediction"] = model.predict(df_future[features])
+
+    os.makedirs(output_path.parent, exist_ok=True)
+    df_future[["prediction"]].to_csv(output_path)
+
+    print(f" Future predictions saved to: {output_path}")
+
+    return df_future
 
 
-def build_features_for_future(df_full):
-    df_full = create_time_features(df_full)
-    df_full = create_lag_features(df_full, target_col="PJME_MW", lags=[364, 728, 1092])
-    return df_full
+# =====================================================
+# HYDRA MAIN
+# =====================================================
 
+@hydra.main(config_path="../../configs/predict", config_name="default", version_base=None)
+def main(cfg: DictConfig):
 
-def predict_future(
-    processed_path="data/processed/energy_features.csv",
-    model_path="models/xgb_model.pkl",
-    output_path="data/processed/future_predictions.csv",
-    future_hours=24 * 365,
-):
-    print("\n Loading historical processed data...")
-    df = pd.read_csv(processed_path, parse_dates=["Datetime"], index_col="Datetime")
+    ROOT = Path(get_original_cwd())
+
+    model_path = ROOT / cfg.predict.model_path
+    features_path = ROOT / cfg.predict.features_path
+    test_output_path = ROOT / cfg.predict.test_output_path
+    future_output_path = ROOT / cfg.predict.future_output_path
+
+    print(f"\n Loading processed dataset from: {features_path}")
+    df = pd.read_csv(
+        features_path,
+        parse_dates=[cfg.predict.datetime_column],
+        index_col=cfg.predict.datetime_column
+    )
     df = df.sort_index()
 
-    print(" Loading model...")
-    model = load_model(model_path)
-
-    print(" Rebuilding full historical feature set...")
-    df_full = build_full_feature_set(df)
-    df_full["isFuture"] = False
-
-    print(" Creating future timestamps...")
-    last_date = df_full.index.max()
-    future_df = create_future_dataframe(last_date, periods=future_hours)
-
-    print(" Concatenating historical + future...")
-    df_future_all = pd.concat([df_full, future_df], axis=0)
-
-    print(" Applying feature engineering to future data...")
-    df_future_all = build_features_for_future(df_future_all)
-
-    df_future = df_future_all[df_future_all["isFuture"] == True].copy()
-
-    FEATURES = [
+    features = [
         "dayofyear", "hour", "dayofweek", "quarter", "month", "year",
         "lag_364d", "lag_728d", "lag_1092d"
     ]
 
-    print(" Running predictions...")
-    df_future["prediction"] = model.predict(df_future[FEATURES])
+    print(f" Loading model from: {model_path}")
+    model = load_xgb_model(model_path)
 
-    print(f" Saving predictions to {output_path}")
-    df_future.index.name = "Datetime"
-    df_future[["prediction"]].to_csv(output_path, index=True)
+    print("\n Running TEST prediction")
+    predict_test(
+        df=df,
+        model=model,
+        split_date="2014-01-01",
+        features=features,
+        target=cfg.predict.target_column,
+        output_path=test_output_path
+    )
 
-
-    print("\n Prediction completed!")
-    return df_future
-
-
-# ──────────────────────────────────────────────
-# 4. MAIN
-# ──────────────────────────────────────────────
-
-def main():
-    # predict_test()
-    predict_future()
+    print("\n Running FUTURE prediction")
+    predict_future(
+        df=df,
+        model=model,
+        horizon_hours=cfg.predict.forecast_horizon,
+        features=features,
+        output_path=future_output_path
+    )
 
 
 if __name__ == "__main__":
