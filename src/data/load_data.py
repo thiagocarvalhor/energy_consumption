@@ -54,6 +54,5 @@ def main(cfg: DictConfig):
 
     print(" load_data completed successfully.")
 
-
 if __name__ == "__main__":
     main()

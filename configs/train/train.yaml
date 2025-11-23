@@ -1,31 +1,35 @@
-train:
-  features:
-    # A ordem aqui deve bater com seu train.py
-    columns:
-      - dayofyear
-      - hour
-      - dayofweek
-      - quarter
-      - month
-      - year
-      - lag_364d
-      - lag_728d
-      - lag_1092d
+path:
+  processed_path: "data/processed/energy_features.csv"
+  output_dir: "models"
 
-  target: "PJME_MW"
+datetime_column: "Datetime"
+target: "PJME_MW"
+train_end: "2014-01-01"
 
-  # Parâmetros do modelo XGBoost
-  model:
-    name: "xgboost"
-    n_estimators: 1000
-    max_depth: 3
-    learning_rate: 0.01
-    booster: "gbtree"
-    base_score: 0.5
-    objective: "reg:squarederror"
+features:
+  columns:
+    - dayofyear
+    - hour
+    - dayofweek
+    - quarter
+    - month
+    - year
+    - lag_364d
+    - lag_728d
+    - lag_1092d
 
-  # Time-series cross-validation
-  cv:
-    n_splits: 5
-    test_size: 8760      # 365 dias * 24h
-    gap: 24              # 24h gap
+model:
+  name: "xgboost"
+  booster: "gbtree"
+  n_estimators: 1000
+  max_depth: 3
+  learning_rate: 0.01
+  base_score: 0.5
+  objective: "reg:squarederror"
+
+cv:
+  n_splits: 5
+  test_size: 8760
+  gap: 24
+
+seed: 42
