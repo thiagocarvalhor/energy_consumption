@@ -1,0 +1,6 @@
+mlflow:
+  tracking_uri: "https://dagshub.com/thiagocarvalhor/energy_consumption.mlflow"
+  experiment_name: "energy_forecast"
+  run_name: "baseline_xgb"
+  username: "${oc.env:MLFLOW_TRACKING_USERNAME, 'token'}"
+  password: "${oc.env:MLFLOW_TRACKING_PASSWORD, ''}"

@@ -1,55 +1,75 @@
+# src/train/train.py
+
+import os
+import hydra
 import pandas as pd
 import numpy as np
 import xgboost as xgb
+from pathlib import Path
+from hydra.utils import get_original_cwd
+from omegaconf import DictConfig
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
 
 
-def train_model(
-    processed_path="data/processed/energy_features.csv",
-    model_output_path="models/xgb_model.pkl",
-):
-    """
-    Train an XGBoost model using time-series cross-validation (TimeSeriesSplit)
-    """
+@hydra.main(config_path="../../configs/train", config_name="train", version_base=None)
+def main(cfg: DictConfig):
 
-    # Load processed data
-    df = pd.read_csv(processed_path, parse_dates=["Datetime"], index_col="Datetime")
+    # ────────────────────────────────────────────────
+    # PATHS
+    # ────────────────────────────────────────────────
+    ROOT = Path(get_original_cwd())
+
+    data_path = ROOT / cfg.path.processed_path
+    model_output_dir = ROOT / cfg.path.output_dir
+    os.makedirs(model_output_dir, exist_ok=True)
+
+    print(f"\n📥 Loading dataset from: {data_path}")
+    df = pd.read_csv(
+        data_path,
+        parse_dates=[cfg.datetime_column],
+        index_col=cfg.datetime_column
+    )
     df = df.sort_index()
 
-    # Features used in Kaggle
-    FEATURES = [
-        "dayofyear",
-        "hour",
-        "dayofweek",
-        "quarter",
-        "month",
-        "year",
-        "lag_364d",
-        "lag_728d",
-        "lag_1092d",
-    ]
-    TARGET = "PJME_MW"
+    # ────────────────────────────────────────────────
+    # CONFIG
+    # ────────────────────────────────────────────────
+    FEATURES = cfg.features.columns
+    TARGET = cfg.target
+    train_end = cfg.train_end
 
-    # Drop rows with NaN caused by lag creation
-    df = df.dropna(subset=FEATURES + [TARGET])
+    # ────────────────────────────────────────────────
+    # FILTER TRAIN WINDOW
+    # ────────────────────────────────────────────────
+    df_train = df[df.index < train_end].copy()
+    df_train = df_train.dropna(subset=FEATURES + [TARGET])
 
-    # TimeSeriesSplit config (same as Kaggle)
+    print(f"\n Training window ends at: {train_end}")
+    print(f" Train samples: {len(df_train):,}")
+
+    # ────────────────────────────────────────────────
+    # TIME SERIES SPLIT
+    # ────────────────────────────────────────────────
+    print("\n Running TimeSeriesSplit...")
+
     tss = TimeSeriesSplit(
-        n_splits=5,
-        test_size=24 * 365 * 1,  # 1 year test window per fold
-        gap=24,                  # 24h gap
+        n_splits=cfg.cv.n_splits,
+        test_size=cfg.cv.test_size,
+        gap=cfg.cv.gap,
     )
 
     scores = []
-    fold = 0
+    model = None
 
-    for train_idx, val_idx in tss.split(df):
-        fold += 1
+    # ────────────────────────────────────────────────
+    # TRAIN LOOP
+    # ────────────────────────────────────────────────
+    for fold, (train_idx, val_idx) in enumerate(tss.split(df_train), start=1):
         print(f"\n===== FOLD {fold} =====")
 
-        train = df.iloc[train_idx]
-        val = df.iloc[val_idx]
+        train = df_train.iloc[train_idx]
+        val = df_train.iloc[val_idx]
 
         X_train = train[FEATURES]
         y_train = train[TARGET]
@@ -57,15 +77,10 @@ def train_model(
         X_val = val[FEATURES]
         y_val = val[TARGET]
 
-        # XGBoost model parameters from Kaggle
+        # MODEL FROM YAML
         model = xgb.XGBRegressor(
-            base_score=0.5,
-            booster="gbtree",
-            n_estimators=1000,
-            early_stopping_rounds=50,
-            objective="reg:linear",
-            max_depth=3,
-            learning_rate=0.01,
+            **cfg.model,
+            random_state=cfg.seed,
         )
 
         model.fit(
@@ -75,24 +90,29 @@ def train_model(
             verbose=100,
         )
 
-        # Validation predictions
         y_pred = model.predict(X_val)
         rmse = np.sqrt(mean_squared_error(y_val, y_pred))
         scores.append(rmse)
 
-        print(f"Fold {fold} RMSE: {rmse:.4f}")
+        print(f" Fold {fold} RMSE: {rmse:,.4f}")
 
-    print("\n===== RESULTS =====")
+    # ────────────────────────────────────────────────
+    # FINAL RESULTS
+    # ────────────────────────────────────────────────
+    print("\n===== FINAL CV RESULTS =====")
     print(f"RMSE per fold: {scores}")
-    print(f"Mean RMSE: {np.mean(scores):.4f}")
+    print(f"Mean RMSE: {np.mean(scores):,.4f}")
 
-    # Save final model (the last trained one)
-    model.save_model(model_output_path)
-    print(f"\nModel saved to {model_output_path}")
+    # ────────────────────────────────────────────────
+    # SAVE MODEL
+    # ────────────────────────────────────────────────
+    model_name = f"{cfg.model.name}.json"
+    model_path = model_output_dir / model_name
 
+    print(f"\n💾 Saving trained model to: {model_path}")
+    model.save_model(model_path)
 
-def main():
-    train_model()
+    print(" Training completed successfully!")
 
 
 if __name__ == "__main__":

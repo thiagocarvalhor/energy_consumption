@@ -1,0 +1,4 @@
+forecast:
+  horizon: 24 * 365   # 1 year of hourly forecast
+  freq: "1H"
+  lags: [364, 728, 1092]

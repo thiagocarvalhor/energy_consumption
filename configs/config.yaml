@@ -1,0 +1,11 @@
+defaults:
+  - data_load: load
+  - features: make
+  - train: train
+  - predict: default
+  - eval: default
+  - mlflow: dagshub
+  - _self_
+
+seed: 42
+output_dir: "outputs"

@@ -1,0 +1,41 @@
+data:
+  path: data/processed/energy_features.csv
+  datetime_column: Datetime
+  target_column: PJME_MW
+  freq: 1H
+  train_end: '2014-01-01'
+model:
+  name: xgboost
+  n_estimators: 1000
+  max_depth: 3
+  learning_rate: 0.01
+  booster: gbtree
+  base_score: 0.5
+  objective: reg:squarederror
+  early_stopping_rounds: 50
+forecast:
+  forecast:
+    horizon: 24 * 365
+    freq: 1H
+    lags:
+    - 364
+    - 728
+    - 1092
+eval:
+  eval:
+    actual_path: data/processed/energy_features.csv
+    test_pred_path: data/processed/test_predictions.csv
+    future_pred_path: data/processed/future_predictions.csv
+    output_dir: data/evaluation
+    target_col: PJME_MW
+    pred_col: prediction
+    datetime_col: Datetime
+mlflow:
+  mlflow:
+    tracking_uri: https://dagshub.com/thiagocarvalhor/energy_consumption.mlflow
+    experiment_name: energy_forecast
+    run_name: baseline_xgb
+    username: ${oc.env:MLFLOW_TRACKING_USERNAME, 'token'}
+    password: ${oc.env:MLFLOW_TRACKING_PASSWORD, ''}
+seed: 42
+output_dir: outputs

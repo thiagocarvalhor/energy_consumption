@@ -1,0 +1,17 @@
+predict:
+  # Caminho do modelo treinado
+  model_path: "models/xgboost.json"
+
+  # Caminho dos dados processados (gerados pelo make_features)
+  features_path: "data/processed/energy_features.csv"
+
+  # Saídas das predições
+  test_output_path: "data/predictions/test_predictions.csv"
+  future_output_path: "data/predictions/future_predictions.csv"
+
+  # Configuração do dataset
+  datetime_column: "Datetime"
+  target_column: "PJME_MW"
+
+  # Número de horas para prever no futuro (1 ano)
+  forecast_horizon: 8760  ##365 * 24  

@@ -5,6 +5,7 @@ description = "Time Series Forecasting with XGBoost, Hydra, DVC and MLflow"
 authors = [
     { name = "Thiago Ribeiro", email = "152446274+thiagocarvalhor@users.noreply.github.com" }
 ]
+packages = [{include = "src"}]
 readme = "README.md"
 requires-python = ">=3.11"
 
