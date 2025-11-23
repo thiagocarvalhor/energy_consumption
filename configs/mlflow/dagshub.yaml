@@ -2,5 +2,10 @@ mlflow:
   tracking_uri: "https://dagshub.com/thiagocarvalhor/energy_consumption.mlflow"
   experiment_name: "energy_forecast"
   run_name: "baseline_xgb"
-  username: "${oc.env:MLFLOW_TRACKING_USERNAME, 'token'}"
-  password: "${oc.env:MLFLOW_TRACKING_PASSWORD, ''}"
+
+  # Autenticação (Hydra lê variáveis de ambiente)
+  username: "${oc.env:MLFLOW_TRACKING_USERNAME}"
+  password: "${oc.env:MLFLOW_TRACKING_PASSWORD}"
+
+  # Onde salvar modelos localmente (opcional, mas recomendado)
+  artifacts_dir: "models/mlflow"

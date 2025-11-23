@@ -109,7 +109,7 @@ def main(cfg: DictConfig):
     model_name = f"{cfg.model.name}.json"
     model_path = model_output_dir / model_name
 
-    print(f"\n💾 Saving trained model to: {model_path}")
+    print(f"\n Saving trained model to: {model_path}")
     model.save_model(model_path)
 
     print(" Training completed successfully!")
