@@ -1,5 +1,5 @@
 features:
-  input_path: "data/interim/energy_raw.csv"
+  input_path: "data/interim/energy_interim.csv"
   output_path: "data/processed/energy_features.csv"
 
   datetime_column: "Datetime"

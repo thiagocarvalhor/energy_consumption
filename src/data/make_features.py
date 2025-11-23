@@ -68,7 +68,7 @@ def main(cfg: DictConfig):
     input_path = ROOT / cfg.features.input_path
     output_path = ROOT / cfg.features.output_path
 
-    print(f"\n Loading INTERIM data from: {input_path}")
+    print(f"\n📥 Loading INTERIM data from: {input_path}")
     df = pd.read_csv(
         input_path,
         parse_dates=[cfg.features.datetime_column],
@@ -76,7 +76,7 @@ def main(cfg: DictConfig):
     )
 
     # Build features
-    print(" Building feature set...")
+    print("🔧 Building feature set...")
     df_feat = build_features(
         df,
         target_col=cfg.features.target_column,
@@ -87,8 +87,8 @@ def main(cfg: DictConfig):
     os.makedirs(output_path.parent, exist_ok=True)
     df_feat.to_csv(output_path)
 
-    print(f" Saved processed dataset to: {output_path}")
-    print(" make_features completed successfully.")
+    print(f"💾 Saved processed dataset to: {output_path}")
+    print("✅ make_features completed successfully.")
 
 
 if __name__ == "__main__":
