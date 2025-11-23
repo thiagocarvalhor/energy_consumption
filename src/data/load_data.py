@@ -2,37 +2,27 @@
 
 import os
 import pandas as pd
+import hydra
+from omegaconf import DictConfig
+from pathlib import Path
 
+CONFIG_DIR = Path(__file__).resolve().parents[2] / "configs"
 
-def load_raw_energy_data(raw_path: str) -> pd.DataFrame:
+def load_raw_energy_data(raw_path: str, datetime_column: str) -> pd.DataFrame:
     """
-    Load the PJME_hourly.csv dataset and prepare the datetime index.
-
-    Parameters
-    ----------
-    raw_path : str
-        Path to the raw CSV downloaded from Kaggle.
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame indexed by Datetime (parsed as datetime64).
+    Load the Kaggle PJME dataset and parse the datetime column.
     """
+
     if not os.path.exists(raw_path):
         raise FileNotFoundError(f"Raw dataset not found at: {raw_path}")
 
-    # Load CSV exactly like Kaggle
     df = pd.read_csv(raw_path)
 
-    datetime_col = "Datetime"
-    if datetime_col not in df.columns:
-        raise ValueError(f"Column '{datetime_col}' not found in dataset.")
+    if datetime_column not in df.columns:
+        raise ValueError(f"Column '{datetime_column}' not found in dataset.")
 
-    # Set Datetime as index
-    df[datetime_col] = pd.to_datetime(df[datetime_col])
-    df = df.set_index(datetime_col)
-
-    # Sort index (always safe for time series)
+    df[datetime_column] = pd.to_datetime(df[datetime_column])
+    df = df.set_index(datetime_column)
     df = df.sort_index()
 
     return df
@@ -46,17 +36,23 @@ def save_interim(df: pd.DataFrame, output_path: str) -> None:
     df.to_csv(output_path)
 
 
-def main( raw_path = "data/raw/PJME_hourly.csv",
-    interim_path = "data/interim/energy_interim.csv"):
+@hydra.main(config_path=str(CONFIG_DIR / "data_load"), config_name="load", version_base=None)
+def main(cfg: DictConfig):
 
+    from hydra.utils import get_original_cwd
+    project_root = Path(get_original_cwd())
 
-    print(f"Loading raw dataset from: {raw_path}")
-    df = load_raw_energy_data(raw_path)
+    raw_path = project_root / cfg.data_load.raw_path
+    output_path = project_root / cfg.data_load.output_path
+    datetime_column = cfg.data_load.datetime_column
 
-    print(f"Saving interim dataset to: {interim_path}")
-    save_interim(df, interim_path)
+    print(f"\n Loading RAW dataset from: {raw_path}")
+    df = load_raw_energy_data(raw_path, datetime_column)
 
-    print("Done.")
+    print(f" Saving INTERIM dataset to: {output_path}")
+    save_interim(df, output_path)
+
+    print(" load_data completed successfully.")
 
 
 if __name__ == "__main__":
