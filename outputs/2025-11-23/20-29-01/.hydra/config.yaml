@@ -1,0 +1,81 @@
+data_load:
+  data_load:
+    raw_path: data/raw/pjme_hourly.csv
+    output_path: data/interim/energy_interim.csv
+    datetime_column: Datetime
+    target_column: PJME_MW
+    freq: 1H
+features:
+  features:
+    input_path: data/interim/energy_interim.csv
+    output_path: data/processed/energy_features.csv
+    datetime_column: Datetime
+    target_column: PJME_MW
+    lags:
+    - 364
+    - 728
+    - 1092
+train:
+  path:
+    processed_path: data/processed/energy_features.csv
+    output_dir: models
+  datetime_column: Datetime
+  target: PJME_MW
+  train_end: '2014-01-01'
+  features:
+    columns:
+    - dayofyear
+    - hour
+    - dayofweek
+    - quarter
+    - month
+    - year
+    - lag_364d
+    - lag_728d
+    - lag_1092d
+  model:
+    name: xgboost
+    booster: gbtree
+    n_estimators: 1000
+    max_depth: 3
+    learning_rate: 0.01
+    base_score: 0.5
+    objective: reg:squarederror
+  cv:
+    n_splits: 5
+    test_size: 8760
+    gap: 24
+  seed: 42
+predict:
+  predict:
+    model_path: models/xgboost.json
+    features_path: data/processed/energy_features.csv
+    test_output_path: data/predictions/test_predictions.csv
+    future_output_path: data/predictions/future_predictions.csv
+    datetime_column: Datetime
+    target_column: PJME_MW
+    forecast_horizon: 8760
+eval:
+  eval:
+    actual_path: data/processed/energy_features.csv
+    test_pred_path: data/processed/test_predictions.csv
+    future_pred_path: data/processed/future_predictions.csv
+    target_col: PJME_MW
+    pred_col: prediction
+    datetime_col: Datetime
+    output_dir: data/evaluation
+mlflow:
+  mlflow:
+    tracking_uri: https://dagshub.com/thiagocarvalhor/energy_consumption.mlflow
+    experiment_name: energy_forecast
+    run_name: baseline_xgb
+    username: ${oc.env:MLFLOW_TRACKING_USERNAME}
+    password: ${oc.env:MLFLOW_TRACKING_PASSWORD}
+    artifacts_dir: models/mlflow
+logger:
+  logger:
+    name: energy_logger
+    level: INFO
+    file_path: logs/energy_logger.log
+seed: 42
+output_dir: outputs

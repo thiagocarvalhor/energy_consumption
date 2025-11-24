@@ -1,0 +1,6 @@
+[2025-11-23 20:33:44,032][energy_logger][INFO] - Starting training pipeline...
+[2025-11-23 20:33:44,032][energy_logger][INFO] - Loading processed dataset from: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\data\processed\energy_features.csv
+[2025-11-23 20:33:44,371][energy_logger][INFO] - Using features: ['dayofyear', 'hour', 'dayofweek', 'quarter', 'month', 'year', 'lag_364d', 'lag_728d', 'lag_1092d']
+[2025-11-23 20:33:44,371][energy_logger][INFO] - Target: PJME_MW
+[2025-11-23 20:33:44,371][energy_logger][INFO] - Training window until: 2014-01-01
+[2025-11-23 20:33:44,401][energy_logger][INFO] - Training samples after filtering/NaN removal: 78,917

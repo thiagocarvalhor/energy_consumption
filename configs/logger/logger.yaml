@@ -1,6 +1,3 @@
-logger:
-  level: "INFO"            # DEBUG, INFO, WARNING, ERROR, CRITICAL
-  to_file: true            # se quiser salvar logs em arquivo ou só no console
-
-  # caminho do arquivo de log (relativo ao project root)
-  file_path: "logs/project.log"
+name: "energy_logger"
+level: "INFO"
+file_path: "energy_logger.log"
