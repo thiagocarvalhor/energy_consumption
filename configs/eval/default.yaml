@@ -1,4 +1,3 @@
-eval:
   actual_path: "data/processed/energy_features.csv"
 
   test_pred_path: "data/processed/test_predictions.csv"

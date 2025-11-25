@@ -1,0 +1,16 @@
+predict:
+  model_path: models/xgboost.json
+  features_path: data/processed/energy_features.csv
+  test_output_path: data/predictions/test_predictions.csv
+  future_output_path: data/predictions/future_predictions.csv
+  datetime_column: Datetime
+  target_column: PJME_MW
+  forecast_horizon: 8760
+mlflow:
+  tracking_uri: https://dagshub.com/thiagocarvalhor/energy_consumption.mlflow
+  experiment_name: energy_forecast
+  run_name: predict_run
+logger:
+  name: predict_logger
+  level: INFO
+  file_path: logs/predict.log

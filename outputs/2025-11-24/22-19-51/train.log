@@ -1,0 +1,16 @@
+[2025-11-24 22:19:51,432][energy_logger][INFO] - Loading processed dataset: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\data\processed\energy_features.csv
+[2025-11-24 22:19:51,782][energy_logger][INFO] - Training samples: 78,917
+[2025-11-24 22:19:53,817][energy_logger][INFO] - Started training run_id = bb282c8729654e038d0f569115759de1
+[2025-11-24 22:19:54,798][energy_logger][INFO] - ===== FOLD 1 =====
+[2025-11-24 22:19:56,458][energy_logger][INFO] - Fold 1 RMSE: 3,391.5509
+[2025-11-24 22:19:56,458][energy_logger][INFO] - ===== FOLD 2 =====
+[2025-11-24 22:19:58,365][energy_logger][INFO] - Fold 2 RMSE: 3,911.8496
+[2025-11-24 22:19:58,365][energy_logger][INFO] - ===== FOLD 3 =====
+[2025-11-24 22:20:01,125][energy_logger][INFO] - Fold 3 RMSE: 3,239.5503
+[2025-11-24 22:20:01,126][energy_logger][INFO] - ===== FOLD 4 =====
+[2025-11-24 22:20:02,964][energy_logger][INFO] - Fold 4 RMSE: 3,314.9594
+[2025-11-24 22:20:02,964][energy_logger][INFO] - ===== FOLD 5 =====
+[2025-11-24 22:20:05,749][energy_logger][INFO] - Fold 5 RMSE: 3,657.3576
+[2025-11-24 22:20:05,983][energy_logger][INFO] - Mean RMSE: 3,503.0535
+[2025-11-24 22:20:07,577][energy_logger][INFO] - Model saved at: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\models\xgboost.json
+[2025-11-24 22:20:07,580][energy_logger][INFO] - run_id saved at: last_run/run_id.txt

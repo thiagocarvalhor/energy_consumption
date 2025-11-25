@@ -1,0 +1,2 @@
+[2025-11-24 22:42:23,222][pipeline_logger][INFO] - Starting FULL PIPELINE: train -> predict -> evaluate
+[2025-11-24 22:42:24,504][pipeline_logger][INFO] - MLflow experiment: energy_forecast

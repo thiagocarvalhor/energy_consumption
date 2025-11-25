@@ -1,0 +1,14 @@
+[2025-11-24 21:24:22,405][energy_logger_predict][INFO] - Starting prediction step...
+[2025-11-24 21:24:22,435][energy_logger_predict][INFO] - Loaded train run_id: 273eebd48a504c518318904b177a2eb4
+[2025-11-24 21:24:25,055][energy_logger_predict][INFO] - MLflow tracking URI: https://dagshub.com/thiagocarvalhor/energy_consumption.mlflow
+[2025-11-24 21:24:25,058][energy_logger_predict][INFO] - MLflow experiment: energy_forecast
+[2025-11-24 21:24:25,062][energy_logger_predict][INFO] - Loading processed dataset: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\data\processed\energy_features.csv
+[2025-11-24 21:24:26,015][energy_logger_predict][INFO] - Loading model from: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\models\xgboost.json
+[2025-11-24 21:24:28,140][energy_logger_predict][INFO] - Started prediction run: efbf5e5c405949a99ee8ffa00f74ea9a
+[2025-11-24 21:24:28,142][energy_logger_predict][INFO] - Running TEST prediction...
+[2025-11-24 21:24:28,613][energy_logger_predict][INFO] - Test RMSE: 3,928.7673
+[2025-11-24 21:24:31,502][energy_logger_predict][INFO] - Test predictions saved to: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\data\predictions\test_predictions.csv
+[2025-11-24 21:24:31,511][energy_logger_predict][INFO] - Running FUTURE prediction...
+[2025-11-24 21:24:35,950][energy_logger_predict][INFO] - Future predictions saved to: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\data\predictions\future_predictions.csv
+[2025-11-24 21:24:36,741][energy_logger_predict][INFO] - All predictions saved to last_run/ folder.
+[2025-11-24 21:24:37,251][energy_logger_predict][INFO] - Prediction task completed successfully.
