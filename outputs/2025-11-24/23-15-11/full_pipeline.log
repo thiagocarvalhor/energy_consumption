@@ -1,0 +1,33 @@
+[2025-11-24 23:15:11,072][pipeline_logger][INFO] - Starting FULL PIPELINE: train -> predict -> evaluate
+[2025-11-24 23:15:12,521][pipeline_logger][INFO] - MLflow experiment: energy_forecast
+[2025-11-24 23:15:13,005][pipeline_logger][INFO] - Parent run_id = cf8dc6732a854beebca0a7f4ccbe234d
+[2025-11-24 23:15:13,006][pipeline_logger][INFO] - STEP 1: Training model...
+[2025-11-24 23:15:13,277][pipeline_logger][INFO] - Train child run_id = 964923ad65e54d01b7da260a944c457f
+[2025-11-24 23:15:13,279][pipeline_logger][INFO] - Loading processed dataset: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\data\processed\energy_features.csv
+[2025-11-24 23:15:13,636][pipeline_logger][INFO] - Training samples: 78,917
+[2025-11-24 23:15:13,637][pipeline_logger][INFO] - Logging into active MLflow run_id = 964923ad65e54d01b7da260a944c457f
+[2025-11-24 23:15:14,708][pipeline_logger][INFO] - ===== FOLD 1 =====
+[2025-11-24 23:15:16,808][pipeline_logger][INFO] - Fold 1 RMSE: 3,391.5509
+[2025-11-24 23:15:16,809][pipeline_logger][INFO] - ===== FOLD 2 =====
+[2025-11-24 23:15:18,912][pipeline_logger][INFO] - Fold 2 RMSE: 3,911.8496
+[2025-11-24 23:15:18,912][pipeline_logger][INFO] - ===== FOLD 3 =====
+[2025-11-24 23:15:20,801][pipeline_logger][INFO] - Fold 3 RMSE: 3,239.5503
+[2025-11-24 23:15:20,801][pipeline_logger][INFO] - ===== FOLD 4 =====
+[2025-11-24 23:15:22,794][pipeline_logger][INFO] - Fold 4 RMSE: 3,314.9594
+[2025-11-24 23:15:22,794][pipeline_logger][INFO] - ===== FOLD 5 =====
+[2025-11-24 23:15:24,974][pipeline_logger][INFO] - Fold 5 RMSE: 3,657.3576
+[2025-11-24 23:15:25,211][pipeline_logger][INFO] - Mean RMSE: 3,503.0535
+[2025-11-24 23:15:27,185][pipeline_logger][INFO] - Model saved at: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\models\xgboost.json
+[2025-11-24 23:15:27,697][pipeline_logger][INFO] - STEP 2: Predicting test and future forecasts...
+[2025-11-24 23:15:27,954][pipeline_logger][INFO] - Predict child run_id = 85680b6540f74372a26bbc999ea95345
+[2025-11-24 23:15:28,708][pipeline_logger][INFO] - Loading model: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\models\xgboost.json
+[2025-11-24 23:15:29,101][pipeline_logger][INFO] - Test RMSE: 3,928.7673
+[2025-11-24 23:15:33,670][pipeline_logger][INFO] - STEP 3: Evaluating predictions...
+[2025-11-24 23:15:33,949][pipeline_logger][INFO] - Evaluate child run_id = cbc1da70890c4f69a425c588aedf64c9
+[2025-11-24 23:15:33,950][pipeline_logger][INFO] - Loading evaluation datasets...
+[2025-11-24 23:15:34,284][pipeline_logger][INFO] - Computing metrics...
+[2025-11-24 23:15:34,286][pipeline_logger][INFO] - Test MAE  = 2878.48
+[2025-11-24 23:15:34,287][pipeline_logger][INFO] - Test RMSE = 3928.60
+[2025-11-24 23:15:39,222][pipeline_logger][INFO] - Evaluation complete.
+[2025-11-24 23:15:39,722][pipeline_logger][INFO] - FULL PIPELINE COMPLETED SUCCESSFULLY!
+[2025-11-24 23:15:39,722][pipeline_logger][INFO] - Evaluation results: {'mae': 2878.4820864661656, 'rmse': 3928.5955487704737}

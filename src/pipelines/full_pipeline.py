@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from omegaconf import DictConfig
 from hydra.utils import get_original_cwd
 from pathlib import Path
+import logging
 
 from src.utils.logger import get_logger
 from src.models.train import run_train
@@ -30,9 +31,9 @@ def main(cfg: DictConfig):
     logs_dir.mkdir(exist_ok=True)
 
     logger = get_logger(
-        name="pipeline_logger",
-        log_file=ROOT / "logs/full_pipeline.log",
-        level="INFO",
+        name=cfg.logger.name,
+        log_file=ROOT / cfg.logger.file_path,
+        level=getattr(logging, cfg.logger.level)
     )
 
     logger.info("Starting FULL PIPELINE: train -> predict -> evaluate")
