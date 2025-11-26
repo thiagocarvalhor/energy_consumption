@@ -28,6 +28,8 @@ data/processed/
 data/predictions/
 data/evaluation/
 data/external/
+outputs/
+
 
 ########################################
 # MODELOS — CONTROLADOS PELO DVC
