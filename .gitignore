@@ -30,7 +30,6 @@ data/evaluation/
 data/external/
 outputs/
 
-
 ########################################
 # MODELOS — CONTROLADOS PELO DVC
 ########################################
@@ -71,3 +70,5 @@ Thumbs.db
 # ITENS ESPECÍFICOS TEMPORÁRIOS
 ########################################
 /test_dvc.txt
+/models
+/outputs

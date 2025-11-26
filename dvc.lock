@@ -1,0 +1,82 @@
+schema: '2.0'
+stages:
+  load_data:
+    cmd: python -m src.data.load_data
+    deps:
+    - path: data/raw/pjme_hourly.csv
+      hash: md5
+      md5: 5908f274ab73d5eaeb88654a8d238df3
+      size: 4070265
+    - path: src/data/load_data.py
+      hash: md5
+      md5: 187bace08dd544b286a922f44f0b535a
+      size: 1696
+    outs:
+    - path: data/interim
+      hash: md5
+      md5: 1d5ded61c4fe5a55483fb2515ef5dabb.dir
+      size: 4215632
+      nfiles: 1
+  make_features:
+    cmd: python -m src.data.make_features
+    deps:
+    - path: data/interim
+      hash: md5
+      md5: 1d5ded61c4fe5a55483fb2515ef5dabb.dir
+      size: 4215632
+      nfiles: 1
+    - path: src/data/make_features.py
+      hash: md5
+      md5: 5d0808e994a9e1cdec47e74ab8b5c027
+      size: 3714
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 2005ff5d9b75c8c9d0438e618f1d9a43.dir
+      size: 10686673
+      nfiles: 1
+  full_pipeline:
+    cmd: python -m src.pipelines.full_pipeline
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 2005ff5d9b75c8c9d0438e618f1d9a43.dir
+      size: 10686673
+      nfiles: 1
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 0a78e9db37b20b2d6fadad4ac1e46c5b
+      size: 5540
+    - path: src/models/predict.py
+      hash: md5
+      md5: ab9b5f714f988f748e44056980f6c13e
+      size: 5688
+    - path: src/models/train.py
+      hash: md5
+      md5: fbdb953b1765cf9875a69c609c3e76f3
+      size: 4622
+    - path: src/pipelines/full_pipeline.py
+      hash: md5
+      md5: 42f2c32ba7e7a8066ca88d0ae027371f
+      size: 4172
+    outs:
+    - path: data/evaluation
+      hash: md5
+      md5: 21b8b0ffc0c4107b939f3a242fe3bbae.dir
+      size: 1780653
+      nfiles: 4
+    - path: data/predictions
+      hash: md5
+      md5: ff722ffff5b7c3e162be3cd1797806ee.dir
+      size: 2245073
+      nfiles: 2
+    - path: models
+      hash: md5
+      md5: 788a8aca3b15ec3f0beae6c4fbdf76f7.dir
+      size: 1139303
+      nfiles: 1
+    - path: outputs
+      hash: md5
+      md5: 3e8ed77383857410be6178909978e96d.dir
+      size: 8823
+      nfiles: 4
