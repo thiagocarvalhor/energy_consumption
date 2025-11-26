@@ -16,30 +16,30 @@ stages:
     outs:
       - data/processed
 
-  train:
-    cmd: python -m src.models.train
-    deps:
-      - data/processed
-      - src/models/train.py
-    outs:
-      - models/xgboost.json
+  # train:
+  #   cmd: python -m src.models.train
+  #   deps:
+  #     - data/processed
+  #     - src/models/train.py
+  #   outs:
+  #     - models/xgboost.json
 
-  predict:
-    cmd: python -m src.models.predict
-    deps:
-      - models/xgboost.json
-      - data/processed
-      - src/models/predict.py
-    outs:
-      - data/predictions
+  # predict:
+  #   cmd: python -m src.models.predict
+  #   deps:
+  #     - models/xgboost.json
+  #     - data/processed
+  #     - src/models/predict.py
+  #   outs:
+  #     - data/predictions
 
-  evaluate:
-    cmd: python -m src.models.evaluate
-    deps:
-      - data/predictions
-      - src/models/evaluate.py
-    outs:
-      - data/evaluation
+  # evaluate:
+  #   cmd: python -m src.models.evaluate
+  #   deps:
+  #     - data/predictions
+  #     - src/models/evaluate.py
+  #   outs:
+  #     - data/evaluation
 
   full_pipeline:
     cmd: python -m src.pipelines.full_pipeline
@@ -50,4 +50,7 @@ stages:
       - src/models/evaluate.py
       - data/processed
     outs:
+      - models         # modelo treinado (xgboost.json)
+      - data/predictions
+      - data/evaluation
       - outputs

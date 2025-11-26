@@ -1,4 +1,5 @@
 [core]
     remote = dagshub_remote
+    autostage = true
 ['remote "dagshub_remote"']
     url = https://dagshub.com/thiagocarvalhor/energy_consumption.dvc
