@@ -1,16 +1,56 @@
 stages:
-  prepare:
-    cmd: python src/data/load_data.py
-    deps:
-    - src/data/load_data.py
-    outs:
-    - data/raw
 
-  features:
-    cmd: python src/features/make_features.py
+  load_data:
+    cmd: python -m src.data.load_data
     deps:
-    - data/raw
-    - src/features/make_features.py
+      - src/data/load_data.py
+      - data/raw/pjme_hourly.csv
     outs:
-    - data/processed
+      - data/interim
 
+  make_features:
+    cmd: python -m src.data.make_features
+    deps:
+      - data/interim
+      - src/data/make_features.py
+    outs:
+      - data/processed
+
+  # train:
+  #   cmd: python -m src.models.train
+  #   deps:
+  #     - data/processed
+  #     - src/models/train.py
+  #   outs:
+  #     - models/xgboost.json
+
+  # predict:
+  #   cmd: python -m src.models.predict
+  #   deps:
+  #     - models/xgboost.json
+  #     - data/processed
+  #     - src/models/predict.py
+  #   outs:
+  #     - data/predictions
+
+  # evaluate:
+  #   cmd: python -m src.models.evaluate
+  #   deps:
+  #     - data/predictions
+  #     - src/models/evaluate.py
+  #   outs:
+  #     - data/evaluation
+
+  full_pipeline:
+    cmd: python -m src.pipelines.full_pipeline
+    deps:
+      - src/pipelines/full_pipeline.py
+      - src/models/train.py
+      - src/models/predict.py
+      - src/models/evaluate.py
+      - data/processed
+    outs:
+      - models         # modelo treinado (xgboost.json)
+      - data/predictions
+      - data/evaluation
+      - outputs

@@ -1,0 +1,3 @@
+name: "energy_logger"
+level: "INFO"
+file_path: "logs/energy_logger.log"

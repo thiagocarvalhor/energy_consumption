@@ -5,6 +5,7 @@ defaults:
   - predict: default
   - eval: default
   - mlflow: dagshub
+  - logger: logger
   - _self_
 
 seed: 42

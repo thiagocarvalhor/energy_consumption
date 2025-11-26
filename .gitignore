@@ -1,35 +1,74 @@
-# Python
+########################################
+# PYTHON
+########################################
 __pycache__/
-*.pyc
+*.py[cod]
+*.so
+*.zip
 
-# Virtualenvs
-.env/
+########################################
+# AMBIENTES VIRTUAIS
+########################################
+.env
 .venv/
+.venv*/
+venv/
 
-# Jupyter
+########################################
+# NOTEBOOKS
+########################################
 .ipynb_checkpoints/
 
-# Data
-data/raw/*
-data/processed/*
-data/external/*
-data/interim/*
+########################################
+# DADOS — CONTROLADOS PELO DVC
+########################################
+data/raw/
+data/interim/
+data/processed/
+data/predictions/
+data/evaluation/
+data/external/
+outputs/
 
-# MLflow
+########################################
+# MODELOS — CONTROLADOS PELO DVC
+########################################
+models/
+
+########################################
+# LOGS
+########################################
+logs/
+*.log
+
+########################################
+# HYDRA — GERADO AUTOMATICAMENTE
+########################################
+outputs/
+
+########################################
+# MLflow (local only)
+########################################
 mlruns/
 
-# Models
-models/*
-
+########################################
 # DVC
+########################################
 .dvc/cache/
 .dvc/tmp/
-!.dvc/
+# Mas permitimos arquivos .dvc
+!.dvc/*.dvc
 
-# VSCode
+########################################
+# EDITORES / SISTEMA
+########################################
 .vscode/
-
-# System
 .DS_Store
 Thumbs.db
+
+########################################
+# ITENS ESPECÍFICOS TEMPORÁRIOS
+########################################
 /test_dvc.txt
+/models
+/outputs
