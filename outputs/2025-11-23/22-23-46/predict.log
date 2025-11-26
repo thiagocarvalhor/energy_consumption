@@ -1,4 +1,0 @@
-[2025-11-23 22:23:46,878][energy_logger_predict][INFO] - Starting prediction step...
-[2025-11-23 22:23:46,878][energy_logger_predict][INFO] - Loaded train run_id: 2ec21c19c045446aa1f390b5f9c0d794
-[2025-11-23 22:23:48,511][energy_logger_predict][INFO] - Loading processed dataset: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\data\processed\energy_features.csv
-[2025-11-23 22:23:49,030][energy_logger_predict][INFO] - Loading model from: D:\Programas\OneDrive - Universidade Federal de Minas Gerais\Data Science\energy_consumption\models\xgboost.json
