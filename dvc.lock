@@ -36,7 +36,7 @@ stages:
       size: 10686673
       nfiles: 1
   full_pipeline:
-    cmd: python -m src.pipelines.full_pipeline
+    cmd: poetry run python -m src.pipelines.full_pipeline
     deps:
     - path: data/processed
       hash: md5
@@ -59,24 +59,32 @@ stages:
       hash: md5
       md5: 42f2c32ba7e7a8066ca88d0ae027371f
       size: 4172
+    params:
+      configs/train/train.yaml:
+        model.base_score: 0.5
+        model.booster: gbtree
+        model.learning_rate: 0.01
+        model.max_depth: 5
+        model.n_estimators: 100
+        model.objective: reg:squarederror
     outs:
     - path: data/evaluation
       hash: md5
-      md5: 21b8b0ffc0c4107b939f3a242fe3bbae.dir
-      size: 1780653
+      md5: f919ba4afdb92c5dc2fdcd86b95ed3eb.dir
+      size: 1774974
       nfiles: 4
     - path: data/predictions
       hash: md5
-      md5: ff722ffff5b7c3e162be3cd1797806ee.dir
-      size: 2245073
+      md5: 579e177727326155e3d19789d71053b6.dir
+      size: 2249552
       nfiles: 2
     - path: models
       hash: md5
-      md5: 788a8aca3b15ec3f0beae6c4fbdf76f7.dir
-      size: 1139303
+      md5: 00f3e044ae75ca3cd1b4c08d35977a12.dir
+      size: 359949
       nfiles: 1
     - path: outputs
       hash: md5
-      md5: 3e8ed77383857410be6178909978e96d.dir
-      size: 8823
+      md5: dc88921e5c5796d9c72e7a6905f70769.dir
+      size: 8830
       nfiles: 4

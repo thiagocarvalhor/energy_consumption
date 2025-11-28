@@ -42,15 +42,26 @@ stages:
   #     - data/evaluation
 
   full_pipeline:
-    cmd: python -m src.pipelines.full_pipeline
+    cmd: poetry run python -m src.pipelines.full_pipeline
+
     deps:
       - src/pipelines/full_pipeline.py
       - src/models/train.py
       - src/models/predict.py
       - src/models/evaluate.py
       - data/processed
+
+    params:
+      - configs/train/train.yaml:
+          - model.n_estimators
+          - model.max_depth
+          - model.learning_rate
+          - model.booster
+          - model.base_score
+          - model.objective
+
     outs:
-      - models         # modelo treinado (xgboost.json)
+      - models
       - data/predictions
       - data/evaluation
       - outputs
